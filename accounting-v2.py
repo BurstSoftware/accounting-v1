@@ -82,11 +82,15 @@ def main():
 
     elif choice == "Record Transaction":
         st.subheader("Record Transaction")
-        debit_account = st.text_input("Enter debit account name")
-        credit_account = st.text_input("Enter credit account name")
-        amount = st.number_input("Enter transaction amount", min_value=0.0, step=0.01)
-        if st.button("Record Transaction"):
-            app.record_transaction(debit_account, credit_account, amount)
+        account_names = list(app.accounts.keys())
+        if account_names:
+            debit_account = st.selectbox("Select debit account", account_names)
+            credit_account = st.selectbox("Select credit account", account_names)
+            amount = st.number_input("Enter transaction amount", min_value=0.0, step=0.01)
+            if st.button("Record Transaction"):
+                app.record_transaction(debit_account, credit_account, amount)
+        else:
+            st.warning("No accounts available. Please create accounts first.")
 
     elif choice == "Generate Balance Sheet":
         st.subheader("Generate Balance Sheet")
