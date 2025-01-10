@@ -4,6 +4,7 @@ from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+
 class Account:
     def __init__(self, name, account_type, balance=0):
         self.name = name
@@ -51,8 +52,8 @@ class AccountingApp:
 
         df = pd.DataFrame({"Type": ["Asset", "Liability", "Equity"],
                            "Total": [sum(balance for _, balance in assets),
-                                      sum(balance for _, balance in liabilities),
-                                      equity]})
+                                     sum(balance for _, balance in liabilities),
+                                     equity]})
         return data, df
 
     def list_accounts(self):
@@ -82,8 +83,14 @@ def download_pdf(data, filename):
             for subkey, subvalue in values.items():
                 pdf.drawString(50, y, f"- {subkey}: {subvalue:.2f}")
                 y -= 20
+        elif isinstance(values, list):
+            pdf.drawString(30, y, f"{key}:")
+            y -= 20
+            for value in values:
+                pdf.drawString(50, y, f"- {value}")
+                y -= 20
         else:
-            pdf.drawString(30, y, f"{key}: {values:.2f}")
+            pdf.drawString(30, y, f"{key}: {values}")
             y -= 20
 
     pdf.save()
