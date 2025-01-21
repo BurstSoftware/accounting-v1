@@ -69,8 +69,10 @@ def create_cash_flow_app():
         current_length = len(st.session_state.cash_flow_data[item])
         if current_length < expected_length:
             st.session_state.cash_flow_data[item].extend([0] * (expected_length - current_length))
+            st.write(f"Extended {item} to {expected_length} items.")
         elif current_length > expected_length:
             st.session_state.cash_flow_data[item] = st.session_state.cash_flow_data[item][:expected_length]
+            st.write(f"Trimmed {item} to {expected_length} items.")
         return st.session_state.cash_flow_data[item]
 
     with tab1:
@@ -83,6 +85,8 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
+                    # Debugging information before the number input
+                    st.write(f"Checking {item} at index {i}: {st.session_state.cash_flow_data[item][i]}")
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
 
@@ -102,6 +106,8 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
+                    # Debugging information before the number input
+                    st.write(f"Checking {item} at index {i}: {st.session_state.cash_flow_data[item][i]}")
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
 
@@ -117,6 +123,8 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
+                    # Debugging information before the number input
+                    st.write(f"Checking {item} at index {i}: {st.session_state.cash_flow_data[item][i]}")
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
 
