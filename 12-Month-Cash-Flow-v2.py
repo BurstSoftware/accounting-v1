@@ -64,17 +64,24 @@ def create_cash_flow_app():
     # Create tabs for different sections
     tab1, tab2, tab3 = st.tabs(['Cash Receipts', 'Cash Paid Out', 'Operating Data'])
 
+    def check_and_extend_list(item, expected_length=14):
+        # Ensures the list for each item has the correct length
+        current_length = len(st.session_state.cash_flow_data[item])
+        if current_length < expected_length:
+            st.session_state.cash_flow_data[item].extend([0] * (expected_length - current_length))
+        elif current_length > expected_length:
+            st.session_state.cash_flow_data[item] = st.session_state.cash_flow_data[item][:expected_length]
+        return st.session_state.cash_flow_data[item]
+
     with tab1:
         st.subheader('Cash Receipts')
         receipt_items = ['Cash Sales', 'Collections fm CR accounts', 'Loan/ other cash in']
         for item in receipt_items:
             st.text(item)
+            check_and_extend_list(item)  # Ensure the list for each item has the correct length
             cols = st.columns(14)
             for i, col in enumerate(cols):
                 with col:
-                    # Ensure the item list has enough elements (14 in total)
-                    if len(st.session_state.cash_flow_data[item]) < 14:
-                        st.session_state.cash_flow_data[item].extend([0] * (14 - len(st.session_state.cash_flow_data[item])))
                     key = f'{item}_{i}'
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
@@ -90,12 +97,10 @@ def create_cash_flow_app():
         
         for item in expense_items:
             st.text(item)
+            check_and_extend_list(item)  # Ensure the list for each item has the correct length
             cols = st.columns(14)
             for i, col in enumerate(cols):
                 with col:
-                    # Ensure the item list has enough elements (14 in total)
-                    if len(st.session_state.cash_flow_data[item]) < 14:
-                        st.session_state.cash_flow_data[item].extend([0] * (14 - len(st.session_state.cash_flow_data[item])))
                     key = f'{item}_{i}'
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
@@ -107,12 +112,10 @@ def create_cash_flow_app():
         
         for item in operating_items:
             st.text(item)
+            check_and_extend_list(item)  # Ensure the list for each item has the correct length
             cols = st.columns(14)
             for i, col in enumerate(cols):
                 with col:
-                    # Ensure the item list has enough elements (14 in total)
-                    if len(st.session_state.cash_flow_data[item]) < 14:
-                        st.session_state.cash_flow_data[item].extend([0] * (14 - len(st.session_state.cash_flow_data[item])))
                     key = f'{item}_{i}'
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
