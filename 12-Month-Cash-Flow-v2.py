@@ -72,6 +72,9 @@ def create_cash_flow_app():
             cols = st.columns(14)
             for i, col in enumerate(cols):
                 with col:
+                    # Ensure the item list has enough elements (14 in total)
+                    if len(st.session_state.cash_flow_data[item]) < 14:
+                        st.session_state.cash_flow_data[item].extend([0] * (14 - len(st.session_state.cash_flow_data[item])))
                     key = f'{item}_{i}'
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
@@ -90,6 +93,9 @@ def create_cash_flow_app():
             cols = st.columns(14)
             for i, col in enumerate(cols):
                 with col:
+                    # Ensure the item list has enough elements (14 in total)
+                    if len(st.session_state.cash_flow_data[item]) < 14:
+                        st.session_state.cash_flow_data[item].extend([0] * (14 - len(st.session_state.cash_flow_data[item])))
                     key = f'{item}_{i}'
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
@@ -104,6 +110,9 @@ def create_cash_flow_app():
             cols = st.columns(14)
             for i, col in enumerate(cols):
                 with col:
+                    # Ensure the item list has enough elements (14 in total)
+                    if len(st.session_state.cash_flow_data[item]) < 14:
+                        st.session_state.cash_flow_data[item].extend([0] * (14 - len(st.session_state.cash_flow_data[item])))
                     key = f'{item}_{i}'
                     value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                     st.session_state.cash_flow_data[item][i] = value
