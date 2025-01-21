@@ -186,7 +186,8 @@ def create_cash_flow_app():
         try:
             df = pd.DataFrame(st.session_state.cash_flow_data, index=months)
             csv = df.to_csv(index=True)
-            
+
+            # Download the CSV file
             st.sidebar.download_button(
                 label="Download CSV",
                 data=csv,
