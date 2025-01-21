@@ -3,7 +3,7 @@ import pandas as pd
 
 def create_cash_flow_app():
     st.title('12 Month Cash Flow Spreadsheet')
-    
+
     # Company Details
     col1, col2 = st.columns(2)
     with col1:
@@ -65,7 +65,7 @@ def create_cash_flow_app():
     tab1, tab2, tab3 = st.tabs(['Cash Receipts', 'Cash Paid Out', 'Operating Data'])
 
     def check_and_extend_list(item, expected_length=14):
-        # Ensure that the list has exactly `expected_length` elements
+        """ Ensures that the list has exactly expected_length elements. """
         current_length = len(st.session_state.cash_flow_data[item])
         if current_length < expected_length:
             st.session_state.cash_flow_data[item].extend([0] * (expected_length - current_length))
@@ -85,13 +85,13 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
-                    # Check the list length before accessing the index
+                    # Check the length of the list to prevent out-of-bound access
                     list_length = len(st.session_state.cash_flow_data[item])
                     if i < list_length:
                         value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                         st.session_state.cash_flow_data[item][i] = value
                     else:
-                        st.write(f"Index {i} exceeds the list length ({list_length}) for {item}")
+                        st.write(f"Error: Attempted to access index {i} for {item}, but list length is {list_length}.")
 
     with tab2:
         st.subheader('Cash Paid Out')
@@ -109,13 +109,13 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
-                    # Check the list length before accessing the index
+                    # Check the length of the list to prevent out-of-bound access
                     list_length = len(st.session_state.cash_flow_data[item])
                     if i < list_length:
                         value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                         st.session_state.cash_flow_data[item][i] = value
                     else:
-                        st.write(f"Index {i} exceeds the list length ({list_length}) for {item}")
+                        st.write(f"Error: Attempted to access index {i} for {item}, but list length is {list_length}.")
 
     with tab3:
         st.subheader('Essential Operating Data')
@@ -129,13 +129,13 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
-                    # Check the list length before accessing the index
+                    # Check the length of the list to prevent out-of-bound access
                     list_length = len(st.session_state.cash_flow_data[item])
                     if i < list_length:
                         value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
                         st.session_state.cash_flow_data[item][i] = value
                     else:
-                        st.write(f"Index {i} exceeds the list length ({list_length}) for {item}")
+                        st.write(f"Error: Attempted to access index {i} for {item}, but list length is {list_length}.")
 
     # Calculate totals
     for i in range(14):
