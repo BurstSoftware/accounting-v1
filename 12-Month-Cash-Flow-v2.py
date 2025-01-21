@@ -135,6 +135,12 @@ def create_cash_flow_app():
             'Depreciation': [0] * 13
         }
     
+    # Ensure data consistency
+    for key in st.session_state.cash_flow_data:
+        if len(st.session_state.cash_flow_data[key]) != 13:
+            st.session_state.cash_flow_data[key] = st.session_state.cash_flow_data[key][:13]
+            st.session_state.cash_flow_data[key] += [0] * (13 - len(st.session_state.cash_flow_data[key]))
+
     # Add page navigation
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Select Month", months)
