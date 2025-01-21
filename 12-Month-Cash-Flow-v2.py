@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import io
 
 def create_cash_flow_app():
     st.title('12 Month Cash Flow Spreadsheet')
@@ -146,7 +145,7 @@ def create_cash_flow_app():
     # Export to CSV
     if st.button('Export to CSV'):
         df = pd.DataFrame(st.session_state.cash_flow_data, index=months)
-        csv = df.to_csv()
+        csv = df.to_csv(index=True)
         
         # Create a download button
         st.download_button(
