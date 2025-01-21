@@ -1,14 +1,83 @@
 import streamlit as st
 import pandas as pd
 
+def display_month_data(month_index, month_name, cash_flow_data):
+    st.header(f"{month_name} Cash Flow Data")
+    
+    # Create three columns for different sections
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.subheader("Cash Receipts")
+        receipt_items = ['Cash on Hand', 'Cash Sales', 'Collections fm CR accounts', 'Loan/ other cash in']
+        for item in receipt_items:
+            try:
+                value = st.number_input(
+                    f"{item}",
+                    value=float(cash_flow_data[item][month_index]),
+                    step=0.01,
+                    key=f"{item}_{month_index}"
+                )
+                cash_flow_data[item][month_index] = value
+            except Exception as e:
+                st.error(f"Error in {item}")
+                cash_flow_data[item][month_index] = 0
+                
+        # Display total receipts
+        total_receipts = cash_flow_data['TOTAL CASH RECEIPTS'][month_index]
+        st.metric("Total Cash Receipts", f"${total_receipts:,.2f}")
+
+    with col2:
+        st.subheader("Cash Paid Out")
+        expense_items = ['Purchases (merchandise)', 'Purchases (specify)', 'Gross wages', 'Payroll expenses',
+                        'Outside services', 'Supplies', 'Repairs & maintenance', 'Advertising',
+                        'Car, delivery & travel', 'Accounting & legal', 'Rent', 'Telephone',
+                        'Utilities', 'Insurance', 'Taxes', 'Interest', 'Other expenses',
+                        'Miscellaneous', 'Loan principal payment', 'Capital purchases',
+                        'Other startup costs', 'Reserve and/or Escrow', 'Owners\' Withdrawal']
+        
+        for item in expense_items:
+            try:
+                value = st.number_input(
+                    f"{item}",
+                    value=float(cash_flow_data[item][month_index]),
+                    step=0.01,
+                    key=f"{item}_{month_index}"
+                )
+                cash_flow_data[item][month_index] = value
+            except Exception as e:
+                st.error(f"Error in {item}")
+                cash_flow_data[item][month_index] = 0
+                
+        # Display total paid out
+        total_paid = cash_flow_data['TOTAL CASH PAID OUT'][month_index]
+        st.metric("Total Cash Paid Out", f"${total_paid:,.2f}")
+
+    with col3:
+        st.subheader("Operating Data")
+        operating_items = ['Sales Volume', 'Accounts Receivable', 'Bad Debt',
+                          'Inventory on hand', 'Accounts Payable', 'Depreciation']
+        
+        for item in operating_items:
+            try:
+                value = st.number_input(
+                    f"{item}",
+                    value=float(cash_flow_data[item][month_index]),
+                    step=0.01,
+                    key=f"{item}_{month_index}"
+                )
+                cash_flow_data[item][month_index] = value
+            except Exception as e:
+                st.error(f"Error in {item}")
+                cash_flow_data[item][month_index] = 0
+
+        # Display cash position
+        cash_position = cash_flow_data['Cash Position'][month_index]
+        st.metric("Cash Position", f"${cash_position:,.2f}")
+
 def create_cash_flow_app():
     st.title('12 Month Cash Flow Spreadsheet')
     
-    # Add error handling banner
-    if 'error_message' in st.session_state:
-        st.error(st.session_state.error_message)
-        del st.session_state.error_message
-
     # Company Details
     col1, col2 = st.columns(2)
     with col1:
@@ -16,11 +85,11 @@ def create_cash_flow_app():
     with col2:
         fiscal_year = st.text_input('Fiscal Year Begins', 'Jan-YY')
 
-    # Create monthly columns (13 total: Pre-Startup + 12 months)
+    # Create monthly columns
     months = ['Pre-Startup EST'] + [f'{m}-YY' for m in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                                                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']]
     
-    # Initialize session state for storing values with proper structure (13 months)
+    # Initialize session state
     if 'cash_flow_data' not in st.session_state:
         st.session_state.cash_flow_data = {
             'Cash on Hand': [0] * 13,
@@ -65,97 +134,26 @@ def create_cash_flow_app():
             'Accounts Payable': [0] * 13,
             'Depreciation': [0] * 13
         }
-
-    def validate_data_length(item):
-        """Validates and fixes the length of data lists"""
-        try:
-            if len(st.session_state.cash_flow_data[item]) != 13:
-                st.session_state.cash_flow_data[item] = [0] * 13
-                st.warning(f"Reset {item} data due to invalid length")
-        except Exception as e:
-            st.session_state.cash_flow_data[item] = [0] * 13
-            st.error(f"Error processing {item}: {str(e)}")
-
-    # Create tabs for different sections
-    tab1, tab2, tab3 = st.tabs(['Cash Receipts', 'Cash Paid Out', 'Operating Data'])
-
-    with tab1:
-        st.subheader('Cash Receipts')
-        receipt_items = ['Cash Sales', 'Collections fm CR accounts', 'Loan/ other cash in']
-        for item in receipt_items:
-            validate_data_length(item)
-            st.text(item)
-            cols = st.columns(13)  # Changed to 13 columns
-            for i, col in enumerate(cols):
-                with col:
-                    try:
-                        key = f'{item}_{i}'
-                        value = st.number_input(
-                            months[i], 
-                            key=key,
-                            value=float(st.session_state.cash_flow_data[item][i]),
-                            step=0.01
-                        )
-                        st.session_state.cash_flow_data[item][i] = value
-                    except Exception as e:
-                        st.error(f"Error in {item} at month {i}")
-                        st.session_state.cash_flow_data[item][i] = 0
-
-    with tab2:
-        st.subheader('Cash Paid Out')
-        expense_items = ['Purchases (merchandise)', 'Purchases (specify)', 'Gross wages', 'Payroll expenses',
-                        'Outside services', 'Supplies', 'Repairs & maintenance', 'Advertising',
-                        'Car, delivery & travel', 'Accounting & legal', 'Rent', 'Telephone',
-                        'Utilities', 'Insurance', 'Taxes', 'Interest', 'Other expenses',
-                        'Miscellaneous', 'Loan principal payment', 'Capital purchases',
-                        'Other startup costs', 'Reserve and/or Escrow', 'Owners\' Withdrawal']
-        
-        for item in expense_items:
-            validate_data_length(item)
-            st.text(item)
-            cols = st.columns(13)  # Changed to 13 columns
-            for i, col in enumerate(cols):
-                with col:
-                    try:
-                        key = f'{item}_{i}'
-                        value = st.number_input(
-                            months[i],
-                            key=key,
-                            value=float(st.session_state.cash_flow_data[item][i]),
-                            step=0.01
-                        )
-                        st.session_state.cash_flow_data[item][i] = value
-                    except Exception as e:
-                        st.error(f"Error in {item} at month {i}")
-                        st.session_state.cash_flow_data[item][i] = 0
-
-    with tab3:
-        st.subheader('Essential Operating Data')
-        operating_items = ['Sales Volume', 'Accounts Receivable', 'Bad Debt',
-                          'Inventory on hand', 'Accounts Payable', 'Depreciation']
-        
-        for item in operating_items:
-            validate_data_length(item)
-            st.text(item)
-            cols = st.columns(13)  # Changed to 13 columns
-            for i, col in enumerate(cols):
-                with col:
-                    try:
-                        key = f'{item}_{i}'
-                        value = st.number_input(
-                            months[i],
-                            key=key,
-                            value=float(st.session_state.cash_flow_data[item][i]),
-                            step=0.01
-                        )
-                        st.session_state.cash_flow_data[item][i] = value
-                    except Exception as e:
-                        st.error(f"Error in {item} at month {i}")
-                        st.session_state.cash_flow_data[item][i] = 0
-
+    
+    # Add page navigation
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio("Select Month", months)
+    month_index = months.index(page)
+    
+    # Display the selected month's data
+    display_month_data(month_index, page, st.session_state.cash_flow_data)
+    
+    # Calculate totals after any changes
     try:
-        # Calculate totals
-        for i in range(13):  # Changed to range(13)
+        for i in range(13):
+            receipt_items = ['Cash Sales', 'Collections fm CR accounts', 'Loan/ other cash in']
+            expense_items = ['Purchases (merchandise)', 'Purchases (specify)', 'Gross wages', 'Payroll expenses',
+                           'Outside services', 'Supplies', 'Repairs & maintenance', 'Advertising',
+                           'Car, delivery & travel', 'Accounting & legal', 'Rent', 'Telephone',
+                           'Utilities', 'Insurance', 'Taxes', 'Interest', 'Other expenses',
+                           'Miscellaneous', 'Loan principal payment', 'Capital purchases',
+                           'Other startup costs', 'Reserve and/or Escrow', 'Owners\' Withdrawal']
+            
             # Calculate TOTAL CASH RECEIPTS
             total_receipts = sum(st.session_state.cash_flow_data[item][i] for item in receipt_items)
             st.session_state.cash_flow_data['TOTAL CASH RECEIPTS'][i] = total_receipts
@@ -166,12 +164,10 @@ def create_cash_flow_app():
             else:
                 cash_available = (st.session_state.cash_flow_data['Cash Position'][i-1] + total_receipts)
             st.session_state.cash_flow_data['Total Cash Available'][i] = cash_available
-
-            # Calculate SUBTOTAL of expenses
+            
+            # Calculate SUBTOTAL and TOTAL CASH PAID OUT
             subtotal = sum(st.session_state.cash_flow_data[item][i] for item in expense_items)
             st.session_state.cash_flow_data['SUBTOTAL'][i] = subtotal
-            
-            # Calculate TOTAL CASH PAID OUT
             st.session_state.cash_flow_data['TOTAL CASH PAID OUT'][i] = subtotal
             
             # Calculate Cash Position
@@ -179,23 +175,19 @@ def create_cash_flow_app():
     except Exception as e:
         st.error(f"Error calculating totals: {str(e)}")
 
-    # Display totals
-    st.subheader("Monthly Totals")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Total Cash Receipts", f"${st.session_state.cash_flow_data['TOTAL CASH RECEIPTS'][-1]:,.2f}")
-    with col2:
-        st.metric("Total Cash Paid Out", f"${st.session_state.cash_flow_data['TOTAL CASH PAID OUT'][-1]:,.2f}")
-    with col3:
-        st.metric("Cash Position", f"${st.session_state.cash_flow_data['Cash Position'][-1]:,.2f}")
+    # Add summary view toggle
+    if st.sidebar.checkbox("Show Summary View"):
+        st.header("Summary View")
+        df = pd.DataFrame(st.session_state.cash_flow_data, index=months)
+        st.dataframe(df)
 
     # Export to CSV
-    if st.button('Export to CSV'):
+    if st.sidebar.button('Export to CSV'):
         try:
             df = pd.DataFrame(st.session_state.cash_flow_data, index=months)
             csv = df.to_csv(index=True)
             
-            st.download_button(
+            st.sidebar.download_button(
                 label="Download CSV",
                 data=csv,
                 file_name='cash_flow.csv',
