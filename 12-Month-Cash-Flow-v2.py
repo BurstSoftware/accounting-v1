@@ -65,7 +65,6 @@ def create_cash_flow_app():
     tab1, tab2, tab3 = st.tabs(['Cash Receipts', 'Cash Paid Out', 'Operating Data'])
 
     def check_and_extend_list(item, expected_length=14):
-        # Ensures the list for each item has the correct length
         current_length = len(st.session_state.cash_flow_data[item])
         if current_length < expected_length:
             st.session_state.cash_flow_data[item].extend([0] * (expected_length - current_length))
@@ -85,10 +84,14 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
-                    # Debugging information before the number input
-                    st.write(f"Checking {item} at index {i}: {st.session_state.cash_flow_data[item][i]}")
-                    value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
-                    st.session_state.cash_flow_data[item][i] = value
+                    # Check length and print debug information
+                    list_length = len(st.session_state.cash_flow_data[item])
+                    st.write(f"Item: {item}, List Length: {list_length}, Index: {i}, Value: {st.session_state.cash_flow_data[item]}")
+                    if i < list_length:
+                        value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
+                        st.session_state.cash_flow_data[item][i] = value
+                    else:
+                        st.write(f"Skipping {item} at index {i} as it exceeds list length")
 
     with tab2:
         st.subheader('Cash Paid Out')
@@ -106,10 +109,14 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
-                    # Debugging information before the number input
-                    st.write(f"Checking {item} at index {i}: {st.session_state.cash_flow_data[item][i]}")
-                    value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
-                    st.session_state.cash_flow_data[item][i] = value
+                    # Check length and print debug information
+                    list_length = len(st.session_state.cash_flow_data[item])
+                    st.write(f"Item: {item}, List Length: {list_length}, Index: {i}, Value: {st.session_state.cash_flow_data[item]}")
+                    if i < list_length:
+                        value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
+                        st.session_state.cash_flow_data[item][i] = value
+                    else:
+                        st.write(f"Skipping {item} at index {i} as it exceeds list length")
 
     with tab3:
         st.subheader('Essential Operating Data')
@@ -123,10 +130,14 @@ def create_cash_flow_app():
             for i, col in enumerate(cols):
                 with col:
                     key = f'{item}_{i}'
-                    # Debugging information before the number input
-                    st.write(f"Checking {item} at index {i}: {st.session_state.cash_flow_data[item][i]}")
-                    value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
-                    st.session_state.cash_flow_data[item][i] = value
+                    # Check length and print debug information
+                    list_length = len(st.session_state.cash_flow_data[item])
+                    st.write(f"Item: {item}, List Length: {list_length}, Index: {i}, Value: {st.session_state.cash_flow_data[item]}")
+                    if i < list_length:
+                        value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
+                        st.session_state.cash_flow_data[item][i] = value
+                    else:
+                        st.write(f"Skipping {item} at index {i} as it exceeds list length")
 
     # Calculate totals
     for i in range(14):
