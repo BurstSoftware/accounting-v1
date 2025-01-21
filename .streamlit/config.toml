@@ -1,0 +1,2 @@
+[server]
+fileWatcherBlacklist = [".git", ".venv", ".DS_Store", ".streamlit"]
