@@ -1,109 +1,160 @@
+import streamlit as st
 import pandas as pd
-import numpy as np
+import io
 
-def process_score_cashflow(file_path):
-    """
-    Process SCORE cash flow template and convert it to the required format with
-    Month, Cash Inflow, and Cash Outflow columns.
-    """
-    # Read the Excel file
-    df = pd.read_excel(file_path)
+def create_cash_flow_app():
+    st.title('12 Month Cash Flow Spreadsheet')
     
-    # Extract months (excluding Pre-Startup EST and Total Item EST columns)
-    months = [col for col in df.columns if col.endswith('-YY')]
+    # Company Details
+    col1, col2 = st.columns(2)
+    with col1:
+        company_name = st.text_input('Enter Company Name')
+    with col2:
+        fiscal_year = st.text_input('Fiscal Year Begins', 'Jan-YY')
+
+    # Create monthly columns
+    months = ['Pre-Startup EST'] + [f'{m}-YY' for m in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']]
     
-    # Initialize lists to store data
-    processed_data = []
-    
-    for month in months:
-        # Cash Inflows (Cash Receipts)
-        cash_inflow = df.loc[df.index[df['CASH RECEIPTS'].notna()].min():
-                           df.index[df['TOTAL CASH RECEIPTS'].notna()].min()-1, 
-                           month].sum()
+    # Initialize session state for storing values
+    if 'cash_flow_data' not in st.session_state:
+        st.session_state.cash_flow_data = {
+            'Cash on Hand': [0] * 14,
+            'CASH RECEIPTS': [],
+            'Cash Sales': [0] * 14,
+            'Collections fm CR accounts': [0] * 14,
+            'Loan/ other cash in': [0] * 14,
+            'TOTAL CASH RECEIPTS': [0] * 14,
+            'Total Cash Available': [0] * 14,
+            'CASH PAID OUT': [],
+            'Purchases (merchandise)': [0] * 14,
+            'Purchases (specify)': [0] * 14,
+            'Gross wages': [0] * 14,
+            'Payroll expenses': [0] * 14,
+            'Outside services': [0] * 14,
+            'Supplies': [0] * 14,
+            'Repairs & maintenance': [0] * 14,
+            'Advertising': [0] * 14,
+            'Car, delivery & travel': [0] * 14,
+            'Accounting & legal': [0] * 14,
+            'Rent': [0] * 14,
+            'Telephone': [0] * 14,
+            'Utilities': [0] * 14,
+            'Insurance': [0] * 14,
+            'Taxes': [0] * 14,
+            'Interest': [0] * 14,
+            'Other expenses': [0] * 14,
+            'Miscellaneous': [0] * 14,
+            'SUBTOTAL': [0] * 14,
+            'Loan principal payment': [0] * 14,
+            'Capital purchases': [0] * 14,
+            'Other startup costs': [0] * 14,
+            'Reserve and/or Escrow': [0] * 14,
+            'Owners\' Withdrawal': [0] * 14,
+            'TOTAL CASH PAID OUT': [0] * 14,
+            'Cash Position': [0] * 14,
+            'ESSENTIAL OPERATING DATA': [],
+            'Sales Volume': [0] * 14,
+            'Accounts Receivable': [0] * 14,
+            'Bad Debt': [0] * 14,
+            'Inventory on hand': [0] * 14,
+            'Accounts Payable': [0] * 14,
+            'Depreciation': [0] * 14
+        }
+
+    # Create tabs for different sections
+    tab1, tab2, tab3 = st.tabs(['Cash Receipts', 'Cash Paid Out', 'Operating Data'])
+
+    with tab1:
+        st.subheader('Cash Receipts')
+        receipt_items = ['Cash Sales', 'Collections fm CR accounts', 'Loan/ other cash in']
+        for item in receipt_items:
+            st.text(item)
+            cols = st.columns(14)
+            for i, col in enumerate(cols):
+                with col:
+                    key = f'{item}_{i}'
+                    value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
+                    st.session_state.cash_flow_data[item][i] = value
+
+    with tab2:
+        st.subheader('Cash Paid Out')
+        expense_items = ['Purchases (merchandise)', 'Purchases (specify)', 'Gross wages', 'Payroll expenses',
+                        'Outside services', 'Supplies', 'Repairs & maintenance', 'Advertising',
+                        'Car, delivery & travel', 'Accounting & legal', 'Rent', 'Telephone',
+                        'Utilities', 'Insurance', 'Taxes', 'Interest', 'Other expenses',
+                        'Miscellaneous', 'Loan principal payment', 'Capital purchases',
+                        'Other startup costs', 'Reserve and/or Escrow', 'Owners\' Withdrawal']
         
-        # Cash Outflows (Cash Paid Out)
-        cash_outflow = df.loc[df.index[df['CASH PAID OUT'].notna()].min():
-                            df.index[df['TOTAL CASH PAID OUT'].notna()].min()-1,
-                            month].sum()
+        for item in expense_items:
+            st.text(item)
+            cols = st.columns(14)
+            for i, col in enumerate(cols):
+                with col:
+                    key = f'{item}_{i}'
+                    value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
+                    st.session_state.cash_flow_data[item][i] = value
+
+    with tab3:
+        st.subheader('Essential Operating Data')
+        operating_items = ['Sales Volume', 'Accounts Receivable', 'Bad Debt',
+                          'Inventory on hand', 'Accounts Payable', 'Depreciation']
         
-        # Store the processed data
-        processed_data.append({
-            'Month': month.replace('-YY', ''),
-            'Cash Inflow': cash_inflow,
-            'Cash Outflow': cash_outflow
-        })
-    
-    # Convert to DataFrame
-    result_df = pd.DataFrame(processed_data)
-    
-    return result_df
+        for item in operating_items:
+            st.text(item)
+            cols = st.columns(14)
+            for i, col in enumerate(cols):
+                with col:
+                    key = f'{item}_{i}'
+                    value = st.number_input(months[i], key=key, value=st.session_state.cash_flow_data[item][i])
+                    st.session_state.cash_flow_data[item][i] = value
 
-def export_processed_data(input_file, output_file):
-    """
-    Process the SCORE cash flow template and export to a new Excel file
-    in the required format.
-    """
-    processed_df = process_score_cashflow(input_file)
-    processed_df.to_excel(output_file, index=False)
-    return processed_df
-
-# Modified Streamlit app code
-def main():
-    st.title("12-Month Cash Flow Application")
-    
-    uploaded_file = st.file_uploader("Upload your SCORE cash flow Excel file", 
-                                   type=["xls", "xlsx"])
-    
-    if uploaded_file:
-        try:
-            # Process the SCORE template
-            processed_data = process_score_cashflow(uploaded_file)
-            
-            # Display raw data
-            st.subheader("Processed Data")
-            st.dataframe(processed_data)
-            
-            # Summary metrics
-            st.subheader("Summary Metrics")
-            processed_data['Net Cash Flow'] = (processed_data['Cash Inflow'] - 
-                                             processed_data['Cash Outflow'])
-            
-            total_inflow = processed_data['Cash Inflow'].sum()
-            total_outflow = processed_data['Cash Outflow'].sum()
-            net_flow = processed_data['Net Cash Flow'].sum()
-            
-            st.write(f"**Total Cash Inflow:** ${total_inflow:,.2f}")
-            st.write(f"**Total Cash Outflow:** ${total_outflow:,.2f}")
-            st.write(f"**Net Cash Flow:** ${net_flow:,.2f}")
-            
-            # Visualization
-            st.subheader("Cash Flow Trend")
-            fig, ax = plt.subplots(figsize=(12, 6))
-            ax.plot(processed_data['Month'], processed_data['Cash Inflow'], 
-                   label='Cash Inflow', marker='o', color='green')
-            ax.plot(processed_data['Month'], processed_data['Cash Outflow'], 
-                   label='Cash Outflow', marker='o', color='red')
-            ax.plot(processed_data['Month'], processed_data['Net Cash Flow'], 
-                   label='Net Cash Flow', marker='o', color='blue')
-            
-            ax.set_xlabel("Month")
-            ax.set_ylabel("Amount ($)")
-            ax.set_title("Monthly Cash Flow")
-            ax.legend()
-            plt.xticks(rotation=45)
-            plt.grid(True, linestyle='--', alpha=0.7)
-            st.pyplot(fig)
-            
-            # Download processed data
-            st.download_button(
-                label="Download Processed Data",
-                data=processed_data.to_csv(index=False),
-                file_name="processed_cashflow.csv",
-                mime="text/csv"
+    # Calculate totals
+    for i in range(14):
+        # Calculate TOTAL CASH RECEIPTS
+        st.session_state.cash_flow_data['TOTAL CASH RECEIPTS'][i] = (
+            st.session_state.cash_flow_data['Cash Sales'][i] +
+            st.session_state.cash_flow_data['Collections fm CR accounts'][i] +
+            st.session_state.cash_flow_data['Loan/ other cash in'][i]
+        )
+        
+        # Calculate Total Cash Available
+        if i == 0:
+            st.session_state.cash_flow_data['Total Cash Available'][i] = (
+                st.session_state.cash_flow_data['Cash on Hand'][i] +
+                st.session_state.cash_flow_data['TOTAL CASH RECEIPTS'][i]
             )
-            
-        except Exception as e:
-            st.error(f"Error processing file: {e}")
+        else:
+            st.session_state.cash_flow_data['Total Cash Available'][i] = (
+                st.session_state.cash_flow_data['Cash Position'][i-1] +
+                st.session_state.cash_flow_data['TOTAL CASH RECEIPTS'][i]
+            )
 
-if __name__ == "__main__":
-    main()
+        # Calculate SUBTOTAL of expenses
+        subtotal = sum(st.session_state.cash_flow_data[item][i] for item in expense_items)
+        st.session_state.cash_flow_data['SUBTOTAL'][i] = subtotal
+        
+        # Calculate TOTAL CASH PAID OUT
+        st.session_state.cash_flow_data['TOTAL CASH PAID OUT'][i] = subtotal
+        
+        # Calculate Cash Position
+        st.session_state.cash_flow_data['Cash Position'][i] = (
+            st.session_state.cash_flow_data['Total Cash Available'][i] -
+            st.session_state.cash_flow_data['TOTAL CASH PAID OUT'][i]
+        )
+
+    # Export to CSV
+    if st.button('Export to CSV'):
+        df = pd.DataFrame(st.session_state.cash_flow_data, index=months)
+        csv = df.to_csv()
+        
+        # Create a download button
+        st.download_button(
+            label="Download CSV",
+            data=csv,
+            file_name='cash_flow.csv',
+            mime='text/csv'
+        )
+
+if __name__ == '__main__':
+    create_cash_flow_app()
