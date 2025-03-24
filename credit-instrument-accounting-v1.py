@@ -217,4 +217,4 @@ if st.sidebar.button("Reset Data"):
     st.sidebar.success("All data reset!")
 
 # Footer
-st.write("Built with Streamlit by Nathan Rossow at (Nathan Rossow)")
+st.write("Built with Streamlit by Nathan Rossow at (Burst Software)")
