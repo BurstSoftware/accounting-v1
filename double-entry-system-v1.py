@@ -136,4 +136,4 @@ if st.button("Reset Ledger"):
     st.write("Ledger reset successfully!")
 
 # Footer
-st.write("Built with Streamlit by Grok 3 (xAI)")
+st.write("Built with Streamlit by Nathan Rossow at (Burst Software)")
