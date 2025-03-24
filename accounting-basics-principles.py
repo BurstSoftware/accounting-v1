@@ -188,4 +188,4 @@ elif page == "Principle of Simplicity":
     st.write("Keep accounting straightforward while meeting reporting needs.")
 
 # Footer
-st.sidebar.write("Built with Streamlit by Grok 3 (xAI)")
+st.sidebar.write("Built with Streamlit by Nathan Rossow at (Burst Software)")
